@@ -62,17 +62,19 @@ export async function getDirectoryContents (dir:FileSystemDirectoryEntry) {
 
 export function handleItems (items:DataTransferItemList):ExpandedDrop {
     let rootDir:ExpandedDrop
+
     for (let i = 0; i < items.length; i++) {
         const item = items[i].webkitGetAsEntry()
         if (item?.isFile) {
+            console.log('is file')
             rootDir = processItem(item)
         } else if (item?.isDirectory) {
+            console.log('is directory')
             rootDir = processItem(item)
         }
     }
 
     if (!rootDir!) throw new Error('not root dir')
-
     return rootDir
 }
 
