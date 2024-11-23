@@ -1,12 +1,6 @@
-import type { ListenerObject } from './index.js'
-import Debug from '@bicycle-codes/debug'
-const debug = Debug()
-
-export function expand (
-    entries:(FileSystemFileEntry|FileSystemDirectoryEntry)[]
-) {
-    debug('expanding', entries)
-}
+import type { ExpandedDrop, ListenerObject } from './index.js'
+// import Debug from '@bicycle-codes/debug'
+// const debug = Debug()
 
 export function isEventHandleable (
     event:DragEvent,
@@ -66,20 +60,18 @@ export async function getDirectoryContents (dir:FileSystemDirectoryEntry) {
     })
 }
 
-export function handleItems (items:DataTransferItemList) {
-    const rootDir:{ files:File[] } & Record<string, any> = { files: [] }
-
+export function handleItems (items:DataTransferItemList):ExpandedDrop {
+    let rootDir:ExpandedDrop
     for (let i = 0; i < items.length; i++) {
         const item = items[i].webkitGetAsEntry()
         if (item?.isFile) {
-            processItem(item, rootDir)
+            rootDir = processItem(item)
         } else if (item?.isDirectory) {
-            // const dir = { [item.name]: { files: [] } }
-            rootDir[item.name] = { files: [] }
-            processItem(item, rootDir[item.name])
-            debug('dirrrrrrrrrr', rootDir)
+            rootDir = processItem(item)
         }
     }
+
+    if (!rootDir!) throw new Error('not root dir')
 
     return rootDir
 }
@@ -93,7 +85,6 @@ function processItem (
     if (item.isFile) {
         // Handle file
         (item as FileSystemFileEntry).file((file) => {
-            // console.log('File:', parentPath + item.name, file)
             parentDir.files.push(file)
         })
     } else if (item.isDirectory) {
@@ -113,198 +104,8 @@ function processItem (
     return parentDir
 }
 
-// /**
-//  * Take a drop list,
-//  * recursively get all the children from the drop if it was a folder.
-//  * if it was files, then return the entries as files
-//  */
-// export async function handleItems (items:DataTransferItemList, parent?:{
-//     files:File[];
-// } & Record<string, any>):Promise<{ files: File[] } & Record<string, any>> {
-//     const parentFolder = parent || { files: [] }
-
-//     for (let i = 0; i < items.length; i++) {
-//         const item = items[i]
-
-//         if (item.kind === 'file') {
-//             const entry = item.webkitGetAsEntry()
-
-//             if (entry?.isDirectory) {
-//                 parentFolder[(entry as FileSystemDirectoryEntry).name] =
-//                 await handleItems((entry as FileSystemDirectoryEntry))
-//                 await getFilesRecursively(
-//                     entry as FileSystemDirectoryEntry,
-//                     parentFolder.files
-//                 )
-//             } else if (entry?.isFile) {
-//                 parentFolder.files.push(await getFileFromEntry(
-//                     entry as FileSystemFileEntry
-//                 ))
-//             }
-//         }
-//     }
-
-//     return parentFolder
-// }
-
-// async function handleDrop (ev:DragEvent) {
-//     ev.preventDefault()
-
-//     const items = ev.dataTransfer!.items
-//     const files:File[] = []
-
-//     for (let i = 0; i < items.length; i++) {
-//         const item = items[i]
-
-//         if (item.kind === 'file') {
-//             const entry = await item.getAsFileSystemHandle()
-
-//             if (entry.kind === 'directory') {
-//                 await getFilesRecursively(entry, files)
-//             } else {
-//                 const file = await entry.getFile()
-//                 files.push(file)
-//             }
-//         }
-//     }
-
-//     // Process the files array
-//     console.log(files)
-// }
-
-// async function getFilesRecursively (
-//     directoryEntry:FileSystemDirectoryEntry,
-//     files:File[]
-// ) {
-//     for await (const entry of directoryEntry.) {
-//         if (entry.kind === 'directory') {
-//             await getFilesRecursively(entry, files)
-//         } else {
-//             const file = await entry.getFile()
-//             files.push(file)
-//         }
-//     }
-// }
-
 export async function getFileFromEntry (entry:FileSystemFileEntry):Promise<File> {
     return new Promise((resolve, reject) => {
         entry.file(resolve, reject)
     })
 }
-
-/**
- * A map from directory name to an object { files:File[] }
- * Recursive type
- */
-export type Directory = Record<string, { files:File[] }> & {
-    [files:string]:File[]
-};
-
-// interface DirectoryInterface {
-//     files:File[];
-// }
-
-// export type Directory = DirectoryInterface & Record<string, Directory>
-
-// async function expandDir (
-//     dir:FileSystemDirectoryEntry,
-//     parent?:{ files:File[] } & Record<string, DirectoryInterface>
-// ):Promise<{ files:File[] }> {
-//     const _parent:{ files:File[] } = parent || { files: [] }
-//     const dirReader = dir.createReader()
-//     while (true) {
-//         const results = await new Promise((resolve, reject) => {
-//             dirReader.readEntries(resolve, reject)
-//         })
-
-//         debug('ressultsttttttt', results)
-
-//         if (!(results as FileSystemEntry[]).length) break
-//     }
-
-//     dirReader.readEntries(async entries => {
-//         for (const entry of entries) {
-//             debug('the sub entry...', entry)
-//             if (entry.isDirectory) {
-//                 _parent[entry.name] = { files: [] }
-//                 return expandDir(
-//                     entry as FileSystemDirectoryEntry,
-//                     _parent[entry.name]
-//                 )
-//             } else if (entry.isFile) {
-//                 _parent.files.push(await getFileFromEntry(entry as FileSystemFileEntry))
-//                 return _parent
-//             }
-//         }
-//     })
-
-//     return _parent
-// }
-
-// // export async function expand (
-// //     entries:(FileSystemDirectoryEntry|FileSystemFileEntry)[],
-// // ):Promise<(File|Directory)[]> {
-// //     return Promise.all(entries.map(async entry => {
-// //         debug('the entry up here', entry)
-// //         if (entry.isDirectory) {
-// //             return await expandDir(entry as FileSystemDirectoryEntry)
-// //         } else if (entry.isFile) {
-// //             return await getFileFromEntry(entry as FileSystemFileEntry)
-// //         }
-// //     }))
-// // }
-
-// export async function expand (
-//     entries:(FileSystemDirectoryEntry|FileSystemFileEntry)[],
-//     parent?:Directory
-// ):Promise<(Directory|File)[]> {
-//     const _parent:Directory = parent || { files: [] } as Directory
-
-//     const arr = await Promise.all(entries.map(entry => {
-//         // if (entry instanceof FileSystemDirectoryEntry) {
-//         // } else if (entry instanceof FileSystemFileEntry) {
-
-//         // }
-//     }))
-
-//     return new Promise((resolve, reject) => {
-//         if (entry.isDirectory) {
-//             const dirReader = (entry as FileSystemDirectoryEntry).createReader()
-//             debug('is dir up here................', entry.name)
-
-//             dirReader.readEntries(async entries => {
-//                 debug('entries', entries)
-//                 for (const entry of entries) {
-//                     if (entry.isDirectory) {
-//                         debug('is down below', entry.name)
-//                         _parent[entry.name] = { files: [] }
-//                         return resolve(expand(
-//                             entry as FileSystemDirectoryEntry,
-//                             _parent[entry.name]
-//                         ))
-//                     } else if (entry.isFile) {
-//                         _parent.files?.push(
-//                             await getFileFromEntry(entry as FileSystemFileEntry)
-//                         )
-//                         return resolve(expand(
-//                             entry as FileSystemFileEntry,
-//                             _parent
-//                         ))
-//                     }
-//                 }
-
-//                 return resolve(_parent)
-//             }, err => {
-//                 debug('err', err)
-//                 return reject(err)
-//             })
-//         } else if (entry.isFile) {
-//             getFileFromEntry(entry as FileSystemFileEntry).then(file => {
-//                 _parent.files?.push(file)
-//                 return resolve(_parent)
-//             }).catch(err => {
-//                 return reject(err)
-//             })
-//         }
-//     })
-// }

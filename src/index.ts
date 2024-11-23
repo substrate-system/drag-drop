@@ -2,28 +2,27 @@ import {
     isEventHandleable,
     addDragClass,
     removeDragClass,
-    expand,
     handleItems
 } from './util'
-import Debug from '@bicycle-codes/debug'
-const debug = Debug()
+// import Debug from '@bicycle-codes/debug'
+// const debug = Debug()
 
-export type Listener = (
-    filesOrDirs:Directory,
-    { pos, fileList, directories }:{
-        pos?:{ x:number, y:number },
-        fileList?:FileList,
-        directories?
-    }
-)=>any
+export interface ExpandedDropInterface {
+    [key:string]:ExpandedDropInterface;
+}
+
+export type ExpandedDrop = ExpandedDropInterface & {
+    files:File[]
+}
+
+export type Listener = (expandedDrop:ExpandedDrop, { pos }:{
+    pos:{ x:number, y:number }
+})=>any
 
 export type ListenerObject = {
     onDrop:(
-        filesOrDirs:Directory,
-        { pos, fileList }:{
-            pos:{ x:number, y:number },
-            fileList:FileList,
-        }
+        epxandedDrop:ExpandedDrop,
+        { pos }:{ pos:{ x:number, y:number } }
     )=>any;
     onDropText?:(text:string, pos:{ x, y })=>any;
     onDragEnter?:(event:DragEvent)=>any;
@@ -125,15 +124,13 @@ export function dragDrop (elem:HTMLElement|string, listeners:Listener|ListenerOb
         ev.stopPropagation()
         ev.preventDefault()
 
-        if (!ev.dataTransfer) throw new Error('not dataTransfer')
-
         if (listenerObject.onDragLeave) {
             listenerObject.onDragLeave(ev)
         }
 
         removeDragClass(el!)
 
-        const fileList = ev.dataTransfer.files
+        if (!ev.dataTransfer) throw new Error('not dataTransfer')  // for TS
 
         isEntered = false
         numIgnoredEnters = 0
@@ -143,30 +140,9 @@ export function dragDrop (elem:HTMLElement|string, listeners:Listener|ListenerOb
             y: ev.clientY
         }
 
-        // const handle = ev.dataTransfer.items[0].webkitGetAsEntry()
+        const expanded = await handleItems(ev.dataTransfer.items)
 
-        const items = Array.from(ev.dataTransfer.items).map(item => {
-            return item.webkitGetAsEntry()
-        })
-
-        const expanded = await expand(
-            items as (FileSystemDirectoryEntry|FileSystemFileEntry)[]
-        )
-
-        // Array.from(ev.dataTransfer.items).forEach(async item => {
-        //     debug('an item..........', item)
-        //     const handle = await item.webkitGetAsEntry()
-        //     const expanded = await expand(handle as FileSystemFileEntry |
-        //         FileSystemDirectoryEntry)
-
-        //     debug('handleeeeeeeeeeeeeeeeeeeeeeeeeee', handle)
-        //     debug('expandeddddddddddddddddddddd', expanded)
-        // })
-
-        // const parent = { files: [] }
-        // const expanded = await expand(Array.from(ev.dataTransfer.items), parent)
-
-        listenerObject.onDrop(expanded, { pos, fileList })
+        listenerObject.onDrop(expanded, { pos })
 
         // text drop support
         const text:string = ev.dataTransfer.getData('text')
@@ -174,65 +150,6 @@ export function dragDrop (elem:HTMLElement|string, listeners:Listener|ListenerOb
             listenerObject.onDropText(text, pos)
         }
 
-        // File drop support. The `dataTransfer.items` API supports directories,
-        // so we use it instead of `dataTransfer.files`, even though it's much
-        // more complicated to use.
-        // See: https://github.com/feross/drag-drop/issues/39
-        // if (ev.dataTransfer.items) {
-        //     const filesOrDirs = (await processItems(
-        //         ev.dataTransfer.items
-        //     ))?.filter(Boolean)
-
-        //     if (!filesOrDirs) return
-        //     if (filesOrDirs.length === 0) return
-
-        //     const fileList = ev.dataTransfer.files
-
-        //     listenerObject.onDrop(filesOrDirs, { pos, fileList })
-        // }
-
         return false
     }
 }
-
-// async function processItems (
-//     items:DataTransferItemList,
-// ):Promise<(File|FileSystemDirectoryEntry|null)[]|null> {
-//     if (items.length === 0) {
-//         return null
-//     }
-
-//     debug('processing', items)
-
-//     // Handle directories in Chrome using the proprietary FileSystem API
-//     // const fileItems = Array.from(items).filter(item => {
-//     //     return item.kind === 'file'
-//     // })
-
-//     // const filesOrDirectories = await Promise.all(Array.from(items).map(file => {
-//     //     debug('iterating...', file.getAsFile())
-//     //     debug('iterating...', file.webkitGetAsEntry())
-//     //     return processEntry(file.webkitGetAsEntry()!)
-//     // }))
-
-//     // if (!filesOrDirectories) return null
-
-//     // return filesOrDirectories.flat()
-// }
-
-// async function processEntry (
-//     entry:FileSystemEntry
-// ):Promise<File[]|FileSystemDirectoryEntry[]|null> {
-//     debug('the entry', entry)
-//     if (entry.isFile) {
-//         const fileFromEntry = await getFileFromEntry(entry as FileSystemFileEntry)
-//         debug('got the file', fileFromEntry)
-//         return [fileFromEntry]
-//     } else if (entry.isDirectory) {
-//         const dirs = await getDirectoriesFromEntry(entry as FileSystemDirectoryEntry)
-//         debug('got the dirs', dirs)
-//         return dirs
-//     }
-
-//     return null
-// }
