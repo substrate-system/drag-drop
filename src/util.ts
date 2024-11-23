@@ -1,6 +1,4 @@
 import type { ExpandedDrop, ListenerObject } from './index.js'
-// import Debug from '@bicycle-codes/debug'
-// const debug = Debug()
 
 export function isEventHandleable (
     event:DragEvent,
@@ -66,10 +64,8 @@ export function handleItems (items:DataTransferItemList):ExpandedDrop {
     for (let i = 0; i < items.length; i++) {
         const item = items[i].webkitGetAsEntry()
         if (item?.isFile) {
-            console.log('is file')
             rootDir = processItem(item)
         } else if (item?.isDirectory) {
-            console.log('is directory')
             rootDir = processItem(item)
         }
     }

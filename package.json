@@ -25,6 +25,7 @@
     "postversion": "git push --follow-tags && npm publish",
     "prepublishOnly": "npm run build"
   },
+  "dependencies": {},
   "devDependencies": {
     "@bicycle-codes/debug": "^0.7.2",
     "@bicycle-codes/dom": "^0.1.2",

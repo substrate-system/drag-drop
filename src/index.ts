@@ -4,8 +4,6 @@ import {
     removeDragClass,
     handleItems
 } from './util'
-// import Debug from '@bicycle-codes/debug'
-// const debug = Debug()
 
 export interface ExpandedDropInterface {
     [key:string]:ExpandedDropInterface;
@@ -131,11 +129,8 @@ export function dragDrop (elem:HTMLElement|string, listeners:Listener|ListenerOb
         removeDragClass(el!)
 
         if (!ev.dataTransfer) {
-            console.log('aaaaaaaaaaa')
             throw new Error('not dataTransfer')  // for TS
         }
-
-        console.log('bbbbbbbbbbbbbbbbbbb')
 
         isEntered = false
         numIgnoredEnters = 0
@@ -145,11 +140,7 @@ export function dragDrop (elem:HTMLElement|string, listeners:Listener|ListenerOb
             y: ev.clientY
         }
 
-        console.log('preeeeeeeeeeeeee expand')
-
         const expanded = handleItems(ev.dataTransfer.items)
-
-        console.log('exxxxxxxxxxpand', expanded)
 
         listenerObject.onDrop(expanded, { pos })
 
