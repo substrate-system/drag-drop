@@ -2,8 +2,10 @@ import type { ListenerObject } from './index.js'
 import Debug from '@bicycle-codes/debug'
 const debug = Debug()
 
-export function expand () {
-    debug('expanding')
+export function expand (
+    entries:(FileSystemFileEntry|FileSystemDirectoryEntry)[]
+) {
+    debug('expanding', entries)
 }
 
 export function isEventHandleable (
@@ -64,15 +66,139 @@ export async function getDirectoryContents (dir:FileSystemDirectoryEntry) {
     })
 }
 
-// export async function getFileFromEntry (entry:FileSystemFileEntry):Promise<File> {
-//     return new Promise((resolve, reject) => {
-//         entry.file(resolve, reject)
-//     })
+export function handleItems (items:DataTransferItemList) {
+    const rootDir:{ files:File[] } & Record<string, any> = { files: [] }
+
+    for (let i = 0; i < items.length; i++) {
+        const item = items[i].webkitGetAsEntry()
+        if (item?.isFile) {
+            processItem(item, rootDir)
+        } else if (item?.isDirectory) {
+            // const dir = { [item.name]: { files: [] } }
+            rootDir[item.name] = { files: [] }
+            processItem(item, rootDir[item.name])
+            debug('dirrrrrrrrrr', rootDir)
+        }
+    }
+
+    return rootDir
+}
+
+function processItem (
+    item:FileSystemEntry,
+    parent?:Record<string, any> & { files:File[] }
+):({ files:File[] } & Record<string, any>) {
+    const parentDir:{ files:File[] } = parent || { files: [] }
+
+    if (item.isFile) {
+        // Handle file
+        (item as FileSystemFileEntry).file((file) => {
+            // console.log('File:', parentPath + item.name, file)
+            parentDir.files.push(file)
+        })
+    } else if (item.isDirectory) {
+        // Handle directory
+        const name = (item as FileSystemDirectoryEntry).name
+        parentDir[name] = { files: [] }
+
+        const reader = (item as FileSystemDirectoryEntry).createReader()
+        reader.readEntries((entries) => {
+            entries.forEach((entry) => {
+                // mutate the parent object each time we recurse
+                processItem(entry, parentDir[name])
+            })
+        })
+    }
+
+    return parentDir
+}
+
+// /**
+//  * Take a drop list,
+//  * recursively get all the children from the drop if it was a folder.
+//  * if it was files, then return the entries as files
+//  */
+// export async function handleItems (items:DataTransferItemList, parent?:{
+//     files:File[];
+// } & Record<string, any>):Promise<{ files: File[] } & Record<string, any>> {
+//     const parentFolder = parent || { files: [] }
+
+//     for (let i = 0; i < items.length; i++) {
+//         const item = items[i]
+
+//         if (item.kind === 'file') {
+//             const entry = item.webkitGetAsEntry()
+
+//             if (entry?.isDirectory) {
+//                 parentFolder[(entry as FileSystemDirectoryEntry).name] =
+//                 await handleItems((entry as FileSystemDirectoryEntry))
+//                 await getFilesRecursively(
+//                     entry as FileSystemDirectoryEntry,
+//                     parentFolder.files
+//                 )
+//             } else if (entry?.isFile) {
+//                 parentFolder.files.push(await getFileFromEntry(
+//                     entry as FileSystemFileEntry
+//                 ))
+//             }
+//         }
+//     }
+
+//     return parentFolder
 // }
 
-// // export type Directory = Record<string, any|Directory> & {
-// //     [files:string]:File[]
-// // };
+// async function handleDrop (ev:DragEvent) {
+//     ev.preventDefault()
+
+//     const items = ev.dataTransfer!.items
+//     const files:File[] = []
+
+//     for (let i = 0; i < items.length; i++) {
+//         const item = items[i]
+
+//         if (item.kind === 'file') {
+//             const entry = await item.getAsFileSystemHandle()
+
+//             if (entry.kind === 'directory') {
+//                 await getFilesRecursively(entry, files)
+//             } else {
+//                 const file = await entry.getFile()
+//                 files.push(file)
+//             }
+//         }
+//     }
+
+//     // Process the files array
+//     console.log(files)
+// }
+
+// async function getFilesRecursively (
+//     directoryEntry:FileSystemDirectoryEntry,
+//     files:File[]
+// ) {
+//     for await (const entry of directoryEntry.) {
+//         if (entry.kind === 'directory') {
+//             await getFilesRecursively(entry, files)
+//         } else {
+//             const file = await entry.getFile()
+//             files.push(file)
+//         }
+//     }
+// }
+
+export async function getFileFromEntry (entry:FileSystemFileEntry):Promise<File> {
+    return new Promise((resolve, reject) => {
+        entry.file(resolve, reject)
+    })
+}
+
+/**
+ * A map from directory name to an object { files:File[] }
+ * Recursive type
+ */
+export type Directory = Record<string, { files:File[] }> & {
+    [files:string]:File[]
+};
 
 // interface DirectoryInterface {
 //     files:File[];

@@ -3,7 +3,7 @@ import {
     addDragClass,
     removeDragClass,
     expand,
-    type Directory
+    handleItems
 } from './util'
 import Debug from '@bicycle-codes/debug'
 const debug = Debug()
