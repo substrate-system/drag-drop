@@ -1,7 +1,12 @@
 {
-  "private": true,
-  "type": "module",
+  "name": "@substrate-system/drag-drop",
   "version": "0.0.0",
+  "type": "module",
+  "description": "Simplify the drag & drop API",
+  "directories": {
+    "example": "example",
+    "test": "test"
+  },
   "main": "dist/index.js",
   "files": [
     "./dist/*"
@@ -25,7 +30,6 @@
     "postversion": "git push --follow-tags && npm publish",
     "prepublishOnly": "npm run build"
   },
-  "dependencies": {},
   "devDependencies": {
     "@bicycle-codes/debug": "^0.7.2",
     "@bicycle-codes/dom": "^0.1.2",
@@ -63,5 +67,19 @@
     }
   },
   "author": "nichoth <nichoth@nichoth.com> (https://nichoth.com)",
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/substrate-system/drag-drop.git"
+  },
+  "keywords": [
+    "drag",
+    "drop",
+    "browser"
+  ],
+  "types": "./dist/index.d.ts",
+  "bugs": {
+    "url": "https://github.com/substrate-system/drag-drop/issues"
+  },
+  "homepage": "https://github.com/substrate-system/drag-drop#readme"
 }
