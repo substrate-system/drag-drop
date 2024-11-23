@@ -1,7 +1,10 @@
 import { test } from '@bicycle-codes/tapzero'
-import { example } from '../src/index.js'
+import { dragDrop } from '../src/index.js'
 
-test('example', async t => {
-    t.ok('ok', 'should be an example')
-    example()
+test('drag drop', (t) => {
+    dragDrop(document.getElementById('drop-target')!, ev => {
+        console.log('event', ev)
+    })
+
+    t.ok(true, "doesn't throw")
 })

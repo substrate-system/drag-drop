@@ -1,0 +1,15 @@
+body {
+  height: 100%;
+}
+
+.dropper {
+    width: 50vw;
+    height: 50vh;
+    margin: 0 auto;
+    border: 2px solid;
+    margin-top: 10vh;
+}
+
+.drag {
+  border: 5px solid red;
+}

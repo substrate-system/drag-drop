@@ -1,11 +1,19 @@
-import { type FunctionComponent, render } from 'preact'
-import { html } from 'htm/preact'
-import { example } from '../src/index.js'
+import Debug from '@bicycle-codes/debug'
+import { dragDrop } from '../src/index.js'
 
-example()
+const debug = Debug()
 
-const Example:FunctionComponent<unknown> = function () {
-    return html`<div>hello</div>`
-}
+dragDrop('.dropper', {
+    onDrop: function (filesOrDirs, { pos, fileList }) {
+        debug('drop position', pos)
 
-render(html`<${Example} />`, document.getElementById('root')!)
+        filesOrDirs.forEach((file) => {
+            debug('a file or directory.....', file)
+        })
+        debug('FileList object', fileList)
+    },
+
+    onDropText: function (text, pos) {
+        debug('onDropText: ' + text + ' at ' + pos.x + ', ' + pos.y)
+    }
+})
