@@ -8,9 +8,26 @@
     "test": "test"
   },
   "main": "dist/index.js",
+  "types": "./dist/index.d.ts",
   "files": [
     "./dist/*"
   ],
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./*": {
+      "import": [
+        "./dist/*.js",
+        "./dist/*"
+      ],
+      "require": [
+        "./dist/*.cjs",
+        "./dist/*"
+      ]
+    }
+  },
   "scripts": {
     "lint": "eslint \"./**/*.{ts,js}\"",
     "build-tests": "esbuild test/index.ts --target=es2020 --bundle --keep-names > test/test-bundle.js",
@@ -30,10 +47,11 @@
     "postversion": "git push --follow-tags && npm publish",
     "prepublishOnly": "npm run build"
   },
+  "dependencies": {},
   "devDependencies": {
-    "@bicycle-codes/debug": "^0.7.2",
-    "@bicycle-codes/dom": "^0.1.2",
-    "@bicycle-codes/tapzero": "^0.10.3",
+    "@substrate-system/debug": "^0.7.2",
+    "@substrate-system/dom": "^0.1.2",
+    "@substrate-system/tapzero": "^0.10.3",
     "@types/wicg-file-system-access": "^2023.10.5",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
@@ -50,22 +68,6 @@
     "typescript": "^5.4.5",
     "vite": "^5.3.3"
   },
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
-    },
-    "./*": {
-      "import": [
-        "./dist/*.js",
-        "./dist/*"
-      ],
-      "require": [
-        "./dist/*.cjs",
-        "./dist/*"
-      ]
-    }
-  },
   "author": "nichoth <nichoth@nichoth.com> (https://nichoth.com)",
   "license": "SEE LICENSE IN LICENSE",
   "repository": {
@@ -77,7 +79,6 @@
     "drop",
     "browser"
   ],
-  "types": "./dist/index.d.ts",
   "bugs": {
     "url": "https://github.com/substrate-system/drag-drop/issues"
   },

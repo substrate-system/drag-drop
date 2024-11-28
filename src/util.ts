@@ -1,4 +1,4 @@
-import type { ExpandedDrop, ListenerObject } from './index.js'
+import type { ListenerObject } from './index.js'
 
 export function isEventHandleable (
     event:DragEvent,
@@ -72,6 +72,17 @@ export function handleItems (items:DataTransferItemList):ExpandedDrop {
 
     if (!rootDir!) throw new Error('not root dir')
     return rootDir
+}
+
+export async function flatten (list:FileList) {
+    const zippable = await Array.from(list).reduce(async (_acc, file) => {
+        const acc = await _acc
+        acc[file.webkitRelativePath] = new Uint8Array(await file.arrayBuffer())
+
+        return acc
+    }, Promise.resolve({}) as Promise<Record<string, Uint8Array>>)
+
+    return zippable
 }
 
 function processItem (

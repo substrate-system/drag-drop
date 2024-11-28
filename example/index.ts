@@ -1,11 +1,11 @@
 import { dragDrop } from '../src/index.js'
-import Debug from '@bicycle-codes/debug'
+import Debug from '@substrate-system/debug'
 const debug = Debug()
 
 dragDrop('.dropper', {
-    onDrop: function (expandedDrop, { pos }) {
+    onDrop: function (drop, { pos }) {
         debug('drop position', pos)
-        debug('expanded drop...', expandedDrop)
+        debug('the dropped stuff...', drop)
     },
 
     onDropText: function (text, pos) {
