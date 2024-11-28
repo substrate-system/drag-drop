@@ -89,39 +89,85 @@ export async function flatten (list:FileList) {
     return zippable
 }
 
-export function processItem (
-    item:FileSystemEntry,
-    parent?:Record<string, any> & { files:File[] }
-):DropRecord {
-    const parentDir:{ files:File[] } = parent || { files: [] }
-    const files = []
+export async function handleDrop (ev:DragEvent) {
+    ev.preventDefault()
 
-    debug('the entry', item)
+    if (!ev.dataTransfer?.items) return
 
-    if (item.isFile) {
-        // Handle file
-        (item as FileSystemFileEntry).file((file) => {
-            parentDir.files.push(file)
-        })
-    } else if (item.isDirectory) {
-        // Handle directory
-        const name = (item as FileSystemDirectoryEntry).name
-        parentDir[name] = { files: [] }
+    for (const item of Array.from(ev.dataTransfer.items)) {
+        if (item.kind === 'file') {
+            const entry = await item.webkitGetAsEntry()
 
-        const reader = (item as FileSystemDirectoryEntry).createReader()
-        reader.readEntries((entries) => {
-            entries.forEach((entry) => {
-                // mutate the parent object each time we recurse
-                processItem(entry, parentDir[name])
+            if (entry?.isDirectory) {
+                const fileList = await getFilesFromDirectory(entry as FileSystemDirectoryEntry)
+                console.log(fileList) // Array of File objects
+            }
+        }
+    }
+}
+
+// export function processItem (
+//     item:FileSystemEntry,
+//     parent?:Record<string, any> & { files:File[] }
+// ):DropRecord {
+//     const parentDir:{ files:File[] } = parent || { files: [] }
+//     const files = []
+
+//     debug('the entry', item)
+
+//     if (item.isFile) {
+//         // Handle file
+//         (item as FileSystemFileEntry).file((file) => {
+//             parentDir.files.push(file)
+//         })
+//     } else if (item.isDirectory) {
+//         // Handle directory
+//         const name = (item as FileSystemDirectoryEntry).name
+//         parentDir[name] = { files: [] }
+
+//         const reader = (item as FileSystemDirectoryEntry).createReader()
+//         reader.readEntries((entries) => {
+//             entries.forEach((entry) => {
+//                 // mutate the parent object each time we recurse
+//                 processItem(entry, parentDir[name])
+//             })
+//         })
+//     }
+
+//     return parentDir
+// }
+
+async function getFilesFromDirectory (directoryEntry: FileSystemDirectoryEntry): Promise<File[]> {
+    const fileList: File[] = []
+
+    const reader = directoryEntry.createReader()
+    const readEntries = (): Promise<void> => {
+        return new Promise((resolve) => {
+            reader.readEntries(async (entries) => {
+                for (const entry of entries) {
+                    if (entry.isFile) {
+                        const file = await getFileFromEntry(entry as FileSystemFileEntry)
+                        fileList.push(file)
+                    } else if (entry.isDirectory) {
+                        const subFiles = await getFilesFromDirectory(entry as FileSystemDirectoryEntry)
+                        fileList.push(...subFiles)
+                    }
+                }
+                if (entries.length > 0) {
+                    await readEntries()
+                } else {
+                    resolve()
+                }
             })
         })
     }
 
-    return parentDir
+    await readEntries()
+    return fileList
 }
 
-export async function getFileFromEntry (entry:FileSystemFileEntry):Promise<File> {
-    return new Promise((resolve, reject) => {
-        entry.file(resolve, reject)
+async function getFileFromEntry (fileEntry: FileSystemFileEntry): Promise<File> {
+    return new Promise((resolve) => {
+        fileEntry.file(resolve)
     })
 }
