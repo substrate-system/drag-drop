@@ -1,4 +1,8 @@
 import type { ListenerObject } from './index.js'
+import Debug from '@substrate-system/debug'
+const debug = Debug()
+
+type DropRecord = Record<string, File|Uint8Array>
 
 export function isEventHandleable (
     event:DragEvent,
@@ -58,21 +62,21 @@ export async function getDirectoryContents (dir:FileSystemDirectoryEntry) {
     })
 }
 
-export function handleItems (items:DataTransferItemList):ExpandedDrop {
-    let rootDir:ExpandedDrop
+// export function handleItems (items:DataTransferItemList):ExpandedDrop {
+//     let rootDir:ExpandedDrop
 
-    for (let i = 0; i < items.length; i++) {
-        const item = items[i].webkitGetAsEntry()
-        if (item?.isFile) {
-            rootDir = processItem(item)
-        } else if (item?.isDirectory) {
-            rootDir = processItem(item)
-        }
-    }
+//     for (let i = 0; i < items.length; i++) {
+//         const item = items[i].webkitGetAsEntry()
+//         if (item?.isFile) {
+//             rootDir = processItem(item)
+//         } else if (item?.isDirectory) {
+//             rootDir = processItem(item)
+//         }
+//     }
 
-    if (!rootDir!) throw new Error('not root dir')
-    return rootDir
-}
+//     if (!rootDir!) throw new Error('not root dir')
+//     return rootDir
+// }
 
 export async function flatten (list:FileList) {
     const zippable = await Array.from(list).reduce(async (_acc, file) => {
@@ -85,11 +89,14 @@ export async function flatten (list:FileList) {
     return zippable
 }
 
-function processItem (
+export function processItem (
     item:FileSystemEntry,
     parent?:Record<string, any> & { files:File[] }
-):({ files:File[] } & Record<string, any>) {
+):DropRecord {
     const parentDir:{ files:File[] } = parent || { files: [] }
+    const files = []
+
+    debug('the entry', item)
 
     if (item.isFile) {
         // Handle file

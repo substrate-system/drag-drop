@@ -134,6 +134,11 @@ export function dragDrop (elem:HTMLElement|string, listeners:Listener|ListenerOb
 
         debug('the items:::', ev.dataTransfer!.items)
 
+        debug('file list???', ev.dataTransfer!.files)
+        const aFile = ev.dataTransfer!.files[0]
+        debug('the file', aFile)
+        debug('aFile path', aFile.webkitRelativePath)
+
         if (listenerObject.onDragLeave) {
             listenerObject.onDragLeave(ev)
         }
