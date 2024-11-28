@@ -42,7 +42,7 @@ npm i -S @substrate-system/drag-drop
 
 ## Module format
 
-This exposes ESM and common JS via [package.json `exports` field](https://nodejs.org/api/packages.html#exports).
+This exposes ESM and common JS via the [package.json `exports` field](https://nodejs.org/api/packages.html#exports).
 
 ### ESM
 ```js
@@ -137,7 +137,7 @@ If you drop a single file, you will get an object containing a `files` array wit
 ```
 
 ## test
-Do manual testing, because it was difficult to mock the drop events.
+Do manual testing, because it is difficult to mock the drop events.
 
 ### Start a local example server
 

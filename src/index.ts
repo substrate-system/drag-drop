@@ -4,22 +4,30 @@ import {
     removeDragClass,
     handleItems
 } from './util'
+import Debug from '@substrate-system/debug'
+const debug = Debug()
 
-export interface ExpandedDropInterface {
-    [key:string]:ExpandedDropInterface;
+// export interface ExpandedDropInterface {
+//     [key:string]:ExpandedDropInterface;
+// }
+
+// export type ExpandedDrop = ExpandedDropInterface & {
+//     files:File[]
+// }
+
+export type AsyncZippableFile = Uint8Array|File|AsyncZippable
+
+export interface AsyncZippable {
+    [path:string]:AsyncZippableFile;
 }
 
-export type ExpandedDrop = ExpandedDropInterface & {
-    files:File[]
-}
-
-export type Listener = (expandedDrop:ExpandedDrop, { pos }:{
+export type Listener = (dropped, { pos }:{
     pos:{ x:number, y:number }
 })=>any
 
 export type ListenerObject = {
     onDrop:(
-        epxandedDrop:ExpandedDrop,
+        epxandedDrop,
         { pos }:{ pos:{ x:number, y:number } }
     )=>any;
     onDropText?:(text:string, pos:{ x, y })=>any;
@@ -122,6 +130,10 @@ export function dragDrop (elem:HTMLElement|string, listeners:Listener|ListenerOb
         ev.stopPropagation()
         ev.preventDefault()
 
+        debug('the drop event.....', ev)
+
+        debug('the items:::', ev.dataTransfer!.items)
+
         if (listenerObject.onDragLeave) {
             listenerObject.onDragLeave(ev)
         }
@@ -140,9 +152,11 @@ export function dragDrop (elem:HTMLElement|string, listeners:Listener|ListenerOb
             y: ev.clientY
         }
 
-        const expanded = handleItems(ev.dataTransfer.items)
+        // const expanded = handleItems(ev.dataTransfer.items)
 
-        listenerObject.onDrop(expanded, { pos })
+        // listenerObject.onDrop(expanded, { pos })
+
+        listenerObject.onDrop(ev.dataTransfer.items, { pos })
 
         // text drop support
         const text:string = ev.dataTransfer.getData('text')
