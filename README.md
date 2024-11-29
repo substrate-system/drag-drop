@@ -41,7 +41,6 @@ npm i -S @substrate-system/drag-drop
 ```
 
 ## Module format
-
 This exposes ESM and common JS via the [package.json `exports` field](https://nodejs.org/api/packages.html#exports).
 
 ### ESM
@@ -68,38 +67,61 @@ cp ./node_modules/@substrate-system/drag-drop/dist/index.min.js ./public/drag-dr
 <script type="module" src="./drag-drop.min.js"></script>
 ```
 
-### Get started
+----------------------------------------------------------------------
+
+## Get started
 This exposes a single function, `dragDrop`. Pass in a callback function, and get data objects containing all the files or directories that were dropped.
 
 ```js
+import { dragDrop, type DropRecord } from '@substrate-system/drag-drop'
+
 dragDrop('.dropper', {  // <-- pass in an element or a string selector
-    onDrop: function (expandedDrop, { pos }) {
+    onDrop: function (drop:DropRecord, { pos }) {
         console.log('drop position', pos)
         // => { x: 100, y: 200 }
 
-        // drop a folder
-        console.log('expanded drop...', expandedDrop)
-        // => {
-        //   abc: {  // <-- the folder name we dropped
-        //     files: [filesHere]  // <-- an array of File objects in the folder
-        //     def: {  // <-- a sub-folder
-        //       files: [moreFiles]  // <-- files inside the sub-folder
-        //     }
-        //   },
-        // }
-
-        // drop some files
-        console.log('expanded drop', expandedDrop)
-        // => {
-        //   files: [file]
-        // }
+        // drop a folder or file
+        console.log('the dropped files', drop)
     },
 })
 ```
 
+-------------------------------------------------------------------------
+
 ## API
 
+### types
+
+#### `Listener`
+
+```ts
+type Listener = (dropped:DropRecord, opts:{ pos:{ x:number, y:number } })=>any
+```
+
+#### `ListenerObject`
+```ts
+type ListenerObject = {
+    onDrop:Listener;
+    onDropText?:(text:string, pos:{ x, y })=>any;
+    onDragEnter?:(event:DragEvent)=>any;
+    onDragOver?:(event:DragEvent)=>any;
+    onDragLeave?:(event:DragEvent)=>any;
+}
+```
+
+### functions
+
+#### `dragDrop`
+```ts
+function dragDrop (
+    elem:HTMLElement|string,
+    listeners:Listener|ListenerObject
+):void
+```
+
 ### Directories
+Drop a folder, get a flat object containing the files mapped by their path names.
+
 Given a folder structure like this:
 ```
 abc
@@ -111,28 +133,23 @@ abc
 3 directories, 2 files
 ```
 
-If we drop the top folder, `abc` into the drop zone, then we get a recursive object like this:
+If we drop the top folder, `abc` into the drop zone, then we get an object like this:
 ```js
 {
-    abc: {  // <-- the root folder name we dropped
-        aaaaa: {  // <-- a sub-folder
-            bbb: {
-                files: ['testbbb.txt']
-            },
-            files: []  // <-- files inside the sub-folder
-        },
-        files: ['test.txt']  // <-- an array of File objects in the root folder
-    },
-    files: []
+    "/abc/aaaaa/bbb/testbbb.txt": File,
+    "/abc/test.txt": File
 }
 ```
 
+The returned object is a flat record with path names pointing at `File` objects.
+
+
 ### Files
-If you drop a single file, you will get an object containing a `files` array with a single item.
+Drop a single file, get an object with just the one file:
 
 ```js
 {
-    files: [yourFile]
+    "/test.txt": File
 }
 ```
 

@@ -1,9 +1,9 @@
-import { dragDrop } from '../src/index.js'
+import { dragDrop, type DropRecord } from '../src/index.js'
 import Debug from '@substrate-system/debug'
 const debug = Debug()
 
 dragDrop('.dropzone', {
-    onDrop: function (drop, { pos }) {
+    onDrop: function (drop:DropRecord, { pos }) {
         debug('drop position', pos)
         debug('the dropped stuff...', drop)
     },

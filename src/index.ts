@@ -8,6 +8,8 @@ import {
 // import Debug from '@substrate-system/debug'
 // const debug = Debug()
 
+export type { DropRecord }
+
 export type Listener = (dropped:DropRecord, opts:{ pos:{ x:number, y:number } })=>any
 
 export type ListenerObject = {
@@ -18,7 +20,16 @@ export type ListenerObject = {
     onDragLeave?:(event:DragEvent)=>any;
 }
 
-export function dragDrop (elem:HTMLElement|string, listeners:Listener|ListenerObject) {
+/**
+ * Listen for drop events on an element. Get a nice flat object of files that
+ * were dropped.
+ *
+ * @throws {Error} If the given string selector does not match anything.
+ */
+export function dragDrop (
+    elem:HTMLElement|string,
+    listeners:Listener|ListenerObject
+):void {
     let el:HTMLElement|null
     if (typeof elem === 'string') {
         const selector = elem
