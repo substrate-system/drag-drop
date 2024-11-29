@@ -94,6 +94,11 @@ dragDrop('.dropper', {  // <-- pass in an element or a string selector
 
 ### types
 
+#### `DropRecord`
+```ts
+type DropRecord = Record<string, File|Uint8Array>
+```
+
 #### `Listener`
 
 ```ts
