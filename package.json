@@ -1,6 +1,6 @@
 {
   "name": "@substrate-system/drag-drop",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "type": "module",
   "description": "Simplify the drag & drop API",
   "directories": {
@@ -43,7 +43,7 @@
     "start": "vite",
     "toc": "markdown-toc --maxdepth 3 -i README.md",
     "preversion": "npm run lint",
-    "version": "npm run toc && && git add README.md",
+    "version": "npm run toc && git add README.md",
     "postversion": "git push --follow-tags && npm publish",
     "prepublishOnly": "npm run build"
   },
