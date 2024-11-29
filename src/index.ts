@@ -2,34 +2,16 @@ import {
     isEventHandleable,
     addDragClass,
     removeDragClass,
-    handleItems
+    handleItems,
+    type DropRecord
 } from './util'
-import Debug from '@substrate-system/debug'
-const debug = Debug()
+// import Debug from '@substrate-system/debug'
+// const debug = Debug()
 
-// export interface ExpandedDropInterface {
-//     [key:string]:ExpandedDropInterface;
-// }
-
-// export type ExpandedDrop = ExpandedDropInterface & {
-//     files:File[]
-// }
-
-export type AsyncZippableFile = Uint8Array|File|AsyncZippable
-
-export interface AsyncZippable {
-    [path:string]:AsyncZippableFile;
-}
-
-export type Listener = (dropped, { pos }:{
-    pos:{ x:number, y:number }
-})=>any
+export type Listener = (dropped:DropRecord, opts:{ pos:{ x:number, y:number } })=>any
 
 export type ListenerObject = {
-    onDrop:(
-        epxandedDrop,
-        { pos }:{ pos:{ x:number, y:number } }
-    )=>any;
+    onDrop:Listener;
     onDropText?:(text:string, pos:{ x, y })=>any;
     onDragEnter?:(event:DragEvent)=>any;
     onDragOver?:(event:DragEvent)=>any;
@@ -67,11 +49,11 @@ export function dragDrop (elem:HTMLElement|string, listeners:Listener|ListenerOb
     el.addEventListener('dragleave', onDragLeave, false)
     el.addEventListener('drop', onDrop, false)
 
-    function onDragEnter (event:DragEvent) {
-        event.stopPropagation()
-        event.preventDefault()
+    function onDragEnter (ev:DragEvent) {
+        ev.stopPropagation()
+        ev.preventDefault()
 
-        if (!isEventHandleable(event, listenerObject)) return
+        if (!isEventHandleable(ev, listenerObject)) return
 
         if (isEntered) {
             numIgnoredEnters += 1
@@ -81,7 +63,7 @@ export function dragDrop (elem:HTMLElement|string, listeners:Listener|ListenerOb
         isEntered = true
 
         if (listenerObject.onDragEnter) {
-            listenerObject.onDragEnter(event)
+            listenerObject.onDragEnter(ev)
         }
 
         addDragClass(el!)
@@ -130,15 +112,6 @@ export function dragDrop (elem:HTMLElement|string, listeners:Listener|ListenerOb
         ev.stopPropagation()
         ev.preventDefault()
 
-        debug('the drop event.....', ev)
-
-        debug('the items:::', ev.dataTransfer!.items)
-
-        debug('file list???', ev.dataTransfer!.files)
-        const aFile = ev.dataTransfer!.files[0]
-        debug('the file', aFile)
-        debug('aFile path', aFile.webkitRelativePath)
-
         if (listenerObject.onDragLeave) {
             listenerObject.onDragLeave(ev)
         }
@@ -157,11 +130,9 @@ export function dragDrop (elem:HTMLElement|string, listeners:Listener|ListenerOb
             y: ev.clientY
         }
 
-        // const expanded = handleItems(ev.dataTransfer.items)
-
-        // listenerObject.onDrop(expanded, { pos })
-
-        listenerObject.onDrop(ev.dataTransfer.items, { pos })
+        // const record = await handleDrop(ev)
+        const record = await handleItems(ev.dataTransfer.items)
+        listenerObject.onDrop(record, { pos })
 
         // text drop support
         const text:string = ev.dataTransfer.getData('text')

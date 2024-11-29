@@ -1,8 +1,11 @@
 import type { ListenerObject } from './index.js'
-import Debug from '@substrate-system/debug'
-const debug = Debug()
+// import Debug from '@substrate-system/debug'
+// const debug = Debug()
 
-type DropRecord = Record<string, File|Uint8Array>
+/**
+ * An object with file paths as keys.
+ */
+export type DropRecord = Record<string, File|Uint8Array>
 
 export function isEventHandleable (
     event:DragEvent,
@@ -62,111 +65,59 @@ export async function getDirectoryContents (dir:FileSystemDirectoryEntry) {
     })
 }
 
-// export function handleItems (items:DataTransferItemList):ExpandedDrop {
-//     let rootDir:ExpandedDrop
-
-//     for (let i = 0; i < items.length; i++) {
-//         const item = items[i].webkitGetAsEntry()
-//         if (item?.isFile) {
-//             rootDir = processItem(item)
-//         } else if (item?.isDirectory) {
-//             rootDir = processItem(item)
-//         }
-//     }
-
-//     if (!rootDir!) throw new Error('not root dir')
-//     return rootDir
-// }
-
-export async function flatten (list:FileList) {
-    const zippable = await Array.from(list).reduce(async (_acc, file) => {
-        const acc = await _acc
-        acc[file.webkitRelativePath] = new Uint8Array(await file.arrayBuffer())
-
-        return acc
-    }, Promise.resolve({}) as Promise<Record<string, Uint8Array>>)
-
-    return zippable
-}
-
-export async function handleDrop (ev:DragEvent) {
-    ev.preventDefault()
-
-    if (!ev.dataTransfer?.items) return
-
-    for (const item of Array.from(ev.dataTransfer.items)) {
-        if (item.kind === 'file') {
-            const entry = await item.webkitGetAsEntry()
-
-            if (entry?.isDirectory) {
-                const fileList = await getFilesFromDirectory(entry as FileSystemDirectoryEntry)
-                console.log(fileList) // Array of File objects
-            }
+export async function handleItems (items:DataTransferItemList):Promise<DropRecord> {
+    let files:DropRecord = {}
+    for (let i = 0; i < items.length; i++) {
+        const item = items[i].webkitGetAsEntry()
+        if (item?.isFile) {
+            const file = await getFileFromEntry(item as FileSystemFileEntry)
+            files[item.fullPath] = file
+        } else if (item?.isDirectory) {
+            files = await getFilesFromDirectory(item as FileSystemDirectoryEntry)
         }
     }
+
+    return files
 }
 
-// export function processItem (
-//     item:FileSystemEntry,
-//     parent?:Record<string, any> & { files:File[] }
-// ):DropRecord {
-//     const parentDir:{ files:File[] } = parent || { files: [] }
-//     const files = []
-
-//     debug('the entry', item)
-
-//     if (item.isFile) {
-//         // Handle file
-//         (item as FileSystemFileEntry).file((file) => {
-//             parentDir.files.push(file)
-//         })
-//     } else if (item.isDirectory) {
-//         // Handle directory
-//         const name = (item as FileSystemDirectoryEntry).name
-//         parentDir[name] = { files: [] }
-
-//         const reader = (item as FileSystemDirectoryEntry).createReader()
-//         reader.readEntries((entries) => {
-//             entries.forEach((entry) => {
-//                 // mutate the parent object each time we recurse
-//                 processItem(entry, parentDir[name])
-//             })
-//         })
-//     }
-
-//     return parentDir
-// }
-
-async function getFilesFromDirectory (directoryEntry: FileSystemDirectoryEntry): Promise<File[]> {
-    const fileList: File[] = []
+/**
+ * Recursively mutate the given `files` record, returning all files in an
+ * object with the file path as key.
+ */
+async function getFilesFromDirectory (
+    directoryEntry:FileSystemDirectoryEntry,
+    files?:DropRecord
+):Promise<DropRecord> {
+    files = files || {}
 
     const reader = directoryEntry.createReader()
-    const readEntries = (): Promise<void> => {
-        return new Promise((resolve) => {
-            reader.readEntries(async (entries) => {
-                for (const entry of entries) {
-                    if (entry.isFile) {
-                        const file = await getFileFromEntry(entry as FileSystemFileEntry)
-                        fileList.push(file)
-                    } else if (entry.isDirectory) {
-                        const subFiles = await getFilesFromDirectory(entry as FileSystemDirectoryEntry)
-                        fileList.push(...subFiles)
-                    }
-                }
-                if (entries.length > 0) {
-                    await readEntries()
-                } else {
-                    resolve()
-                }
-            })
-        })
+    const entries = await new Promise<FileSystemEntry[]>((resolve) => {
+        reader.readEntries(resolve)
+    })
+
+    for (const entry of entries) {
+        if (entry.isFile) {
+            const _entry = entry as FileSystemFileEntry
+            const file = await getFileFromEntry(_entry)
+            files[_entry.fullPath] = file
+        } else {
+            // is directory
+            await getFilesFromDirectory(entry as FileSystemDirectoryEntry, files)
+        }
     }
 
-    await readEntries()
-    return fileList
+    return files
 }
 
-async function getFileFromEntry (fileEntry: FileSystemFileEntry): Promise<File> {
+/**
+ * Given a `FileSystemFileEntry`, return the `File`.
+ *
+ * @param {FileSystemFileEntry} fileEntry
+ * @returns {Promise<File>}
+ */
+export async function getFileFromEntry (
+    fileEntry:FileSystemFileEntry
+):Promise<File> {
     return new Promise((resolve) => {
         fileEntry.file(resolve)
     })

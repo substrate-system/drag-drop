@@ -2,7 +2,7 @@ body {
   height: 100%;
 }
 
-.dropper {
+.dropzone {
     width: 50vw;
     height: 50vh;
     margin: 0 auto;
