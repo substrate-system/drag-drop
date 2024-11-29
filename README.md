@@ -116,13 +116,17 @@ type ListenerObject = {
 }
 ```
 
-### functions
+### Functions
+A single function, `dragDrop`.
+
+Can pass in a third argument with `showHiddenFiles`, which if `true` will callback with all files, including ones that start with `.`. Defaults to `false`.
 
 #### `dragDrop`
 ```ts
 function dragDrop (
     elem:HTMLElement|string,
-    listeners:Listener|ListenerObject
+    listeners:Listener|ListenerObject,
+    opts?:{ showHiddenFiles?:boolean }
 ):void
 ```
 
@@ -146,6 +150,45 @@ If we drop the top folder, `abc` into the drop zone, then we get an object like 
     "/abc/aaaaa/bbb/testbbb.txt": File,
     "/abc/test.txt": File
 }
+```
+
+#### Example
+
+```js
+import { dragDrop, type DropRecord } from '@substrate-system/drag-drop'
+
+dragDrop('.dropzone', (drop:DropRecord, { pos } => {
+  debug('the drop', drop)
+
+  // =>
+  // {
+  //   "/abc/aaaaa/bbb/testbbb.txt": {},
+  //   "/abc/test2.txt": {},
+  //   "/abc/test.txt": {}
+  // }
+}
+```
+
+### Hidden files
+Pass in an options object with `{ showHiddenFiles: true }` to get results including dot files. By default this will **exclude hidden files** from the results.
+
+#### Example
+
+```js
+import { dragDrop } from '@substrate-system/drag-drop'
+
+dragDrop('.dropzone', (dropRecord) => {
+  debug('including hidden files...', dropRecord)
+
+  // =>
+  // {
+  //   "/abc/.DS_Store": {},
+  //   "/abc/aaaaa/.DS_Store": {},
+  //   "/abc/aaaaa/bbb/testbbb.txt": {},
+  //   "/abc/test2.txt": {},
+  //   "/abc/test.txt": {}
+  // }
+}, { showHiddenFiles: true })
 ```
 
 The returned object is a flat record with path names pointing at `File` objects.

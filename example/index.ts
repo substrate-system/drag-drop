@@ -13,3 +13,7 @@ dragDrop('.dropzone', {
         debug('onDropText: ' + text + ' at ' + pos.x + ', ' + pos.y)
     }
 })
+
+dragDrop('.dropzone', (dropRecord) => {
+    debug('including hidden files...', dropRecord)
+}, { showHiddenFiles: true })

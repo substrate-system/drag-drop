@@ -28,8 +28,10 @@ export type ListenerObject = {
  */
 export function dragDrop (
     elem:HTMLElement|string,
-    listeners:Listener|ListenerObject
+    listeners:Listener|ListenerObject,
+    opts?:{ showHiddenFiles?:boolean }
 ):void {
+    const showHidden = opts?.showHiddenFiles ?? false
     let el:HTMLElement|null
     if (typeof elem === 'string') {
         const selector = elem
@@ -141,8 +143,7 @@ export function dragDrop (
             y: ev.clientY
         }
 
-        // const record = await handleDrop(ev)
-        const record = await handleItems(ev.dataTransfer.items)
+        const record = await handleItems(ev.dataTransfer.items, showHidden)
         listenerObject.onDrop(record, { pos })
 
         // text drop support

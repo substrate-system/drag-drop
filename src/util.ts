@@ -1,6 +1,6 @@
 import type { ListenerObject } from './index.js'
-// import Debug from '@substrate-system/debug'
-// const debug = Debug()
+import Debug from '@substrate-system/debug'
+const debug = Debug()
 
 /**
  * An object with file paths as keys.
@@ -65,15 +65,29 @@ export async function getDirectoryContents (dir:FileSystemDirectoryEntry) {
     })
 }
 
-export async function handleItems (items:DataTransferItemList):Promise<DropRecord> {
+export async function handleItems (
+    items:DataTransferItemList,
+    showHiddenFiles:boolean = false
+):Promise<DropRecord> {
+    debug('handling it', showHiddenFiles)
     let files:DropRecord = {}
     for (let i = 0; i < items.length; i++) {
         const item = items[i].webkitGetAsEntry()
+        debug('fullpath', item?.fullPath)
+        debug('the pop', item?.fullPath.split('/').pop())
+        if (item?.fullPath.split('/').pop()?.startsWith('.')) {
+            if (!showHiddenFiles) continue
+        }
+
         if (item?.isFile) {
             const file = await getFileFromEntry(item as FileSystemFileEntry)
             files[item.fullPath] = file
         } else if (item?.isDirectory) {
-            files = await getFilesFromDirectory(item as FileSystemDirectoryEntry)
+            files = await getFilesFromDirectory(
+                item as FileSystemDirectoryEntry,
+                null,
+                showHiddenFiles
+            )
         }
     }
 
@@ -86,7 +100,8 @@ export async function handleItems (items:DataTransferItemList):Promise<DropRecor
  */
 async function getFilesFromDirectory (
     directoryEntry:FileSystemDirectoryEntry,
-    files?:DropRecord
+    files?:DropRecord|null,
+    showHiddenFiles:boolean = false
 ):Promise<DropRecord> {
     files = files || {}
 
@@ -97,12 +112,19 @@ async function getFilesFromDirectory (
 
     for (const entry of entries) {
         if (entry.isFile) {
+            const isHidden = entry.fullPath.split('/').pop()?.startsWith('.')
+            if (isHidden && !showHiddenFiles) continue
+
             const _entry = entry as FileSystemFileEntry
             const file = await getFileFromEntry(_entry)
             files[_entry.fullPath] = file
         } else {
             // is directory
-            await getFilesFromDirectory(entry as FileSystemDirectoryEntry, files)
+            await getFilesFromDirectory(
+                entry as FileSystemDirectoryEntry,
+                files,
+                showHiddenFiles
+            )
         }
     }
 
