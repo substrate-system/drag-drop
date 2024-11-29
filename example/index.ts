@@ -1,5 +1,6 @@
 import { dragDrop, type DropRecord } from '../src/index.js'
 import Debug from '@substrate-system/debug'
+import './style.css'
 const debug = Debug()
 
 dragDrop('.dropzone', {
