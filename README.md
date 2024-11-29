@@ -8,7 +8,7 @@
 [![dependencies](https://img.shields.io/badge/dependencies-zero-brightgreen.svg?style=flat-square)](package.json)
 [![license](https://img.shields.io/badge/license-Polyform_Non_Commercial-26bc71?style=flat-square)](LICENSE)
 
-Simplify the [drag & drop API](https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API). Get drop events with an object matching the folder structure that was dropped.
+Simplify the [drag & drop API](https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API). Pass in a callback function, get drop events with a flat object of paths and files.
 
 Inspired by [feross/drag-drop](https://github.com/feross/drag-drop) -- drag & drop usable by humans.
 
