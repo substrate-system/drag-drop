@@ -2,7 +2,7 @@ import { dragDrop } from '../src/index.js'
 import Debug from '@substrate-system/debug'
 const debug = Debug()
 
-dragDrop('.dropper', {
+dragDrop('.dropzone', {
     onDrop: function (drop, { pos }) {
         debug('drop position', pos)
         debug('the dropped stuff...', drop)
