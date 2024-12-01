@@ -5,7 +5,7 @@ const debug = Debug()
 /**
  * An object with file paths as keys.
  */
-export type DropRecord = Record<string, File|Uint8Array>
+export type DropRecord = Record<string, File>
 
 export function isEventHandleable (
     event:DragEvent,
