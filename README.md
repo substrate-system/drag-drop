@@ -24,6 +24,7 @@ Inspired by [feross/drag-drop](https://github.com/feross/drag-drop) -- drag & dr
   * [Common JS](#common-js)
   * [pre-built JS](#pre-built-js)
 - [Get started](#get-started)
+  * [CSS](#css)
 - [API](#api)
   * [types](#types)
   * [Functions](#functions)
