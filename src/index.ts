@@ -10,7 +10,10 @@ import {
 
 export type { DropRecord }
 
-export type Listener = (dropped:DropRecord, opts:{ pos:{ x:number, y:number } })=>any
+export type Listener = (dropped:DropRecord, opts:{
+    pos:{ x:number, y:number };
+    files:FileList;
+})=>any
 
 export type ListenerObject = {
     onDrop:Listener;
@@ -144,7 +147,7 @@ export function dragDrop (
         }
 
         const record = await handleItems(ev.dataTransfer.items, showHidden)
-        listenerObject.onDrop(record, { pos })
+        listenerObject.onDrop(record, { pos, files: ev.dataTransfer.files })
 
         // text drop support
         const text:string = ev.dataTransfer.getData('text')
