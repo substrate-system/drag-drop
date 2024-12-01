@@ -74,23 +74,22 @@ cp ./node_modules/@substrate-system/drag-drop/dist/index.min.js ./public/drag-dr
 ----------------------------------------------------------------------
 
 ## Get started
-This exposes a single function, `dragDrop`. Pass in a callback function, and get data objects containing all the files or directories that were dropped.
+This exposes a single function, `dragDrop`. Pass in a callback function, and get data objects containing all the files or directories that were dropped. By default the callback will not see any [hidden files (dot files)](https://en.wikipedia.org/wiki/Hidden_file_and_hidden_directory#Unix_and_Unix-like_environments). Pass in another argument with `{ showHiddenFiles: true }` if you do want to see hidden files.
 
 ```js
 import { dragDrop, type DropRecord } from '@substrate-system/drag-drop'
 
-dragDrop('.dropper', {  // <-- pass in an element or a string selector
-    onDrop: function (drop:DropRecord, { pos, files }) {
-        console.log('drop position', pos)
-        // => { x: 100, y: 200 }
+// pass in an element or a CSS query selector
+dragrop('.dropper',  (drop:DropRecord, { pos, files }) => {
+  console.log('drop position', pos)
+  // => { x: 100, y: 200 }
 
-        // drop a folder or file
-        console.log('the dropped files', drop)
+  // drop a folder or file
+  console.log('the dropped files', drop)
 
-        // we get the FileList object from the event too
-        console.log('the file list', files)
-    },
-})
+  // we get the FileList object from the event too
+  console.log('the file list', files)
+}, { showHiddenFiles: true })  // <-- third argument is optional
 ```
 
 ### CSS
