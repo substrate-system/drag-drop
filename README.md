@@ -89,6 +89,15 @@ dragDrop('.dropper', {  // <-- pass in an element or a string selector
 })
 ```
 
+### CSS
+When someone hovers and drops something, a class `.drag` is added to the drop target.
+
+```css
+.drag {
+  border: 5px solid red;
+}
+```
+
 -------------------------------------------------------------------------
 
 ## API
@@ -96,8 +105,15 @@ dragDrop('.dropper', {  // <-- pass in an element or a string selector
 ### types
 
 #### `DropRecord`
+A map from path name to file object.
 ```ts
 type DropRecord = Record<string, File|Uint8Array>
+```
+
+##### example
+
+```js
+{ '/abc/123': aFile }
 ```
 
 #### `Listener`
@@ -118,9 +134,9 @@ type ListenerObject = {
 ```
 
 ### Functions
-A single function, `dragDrop`.
+A single function, `dragDrop`, that takes an element, a listener, an an options object.
 
-Can pass in a third argument with `showHiddenFiles`, which if `true` will callback with all files, including ones that start with `.`. Defaults to `false`.
+The third argument has a property `showHiddenFiles`, which if `true` will callback with all files, including ones that start with `.`. By default is `false`.
 
 #### `dragDrop`
 ```ts
