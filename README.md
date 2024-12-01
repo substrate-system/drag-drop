@@ -80,12 +80,15 @@ This exposes a single function, `dragDrop`. Pass in a callback function, and get
 import { dragDrop, type DropRecord } from '@substrate-system/drag-drop'
 
 dragDrop('.dropper', {  // <-- pass in an element or a string selector
-    onDrop: function (drop:DropRecord, { pos }) {
+    onDrop: function (drop:DropRecord, { pos, files }) {
         console.log('drop position', pos)
         // => { x: 100, y: 200 }
 
         // drop a folder or file
         console.log('the dropped files', drop)
+
+        // we get the FileList object from the event too
+        console.log('the file list', files)
     },
 })
 ```
@@ -120,7 +123,10 @@ type DropRecord = Record<string, File|Uint8Array>
 #### `Listener`
 
 ```ts
-type Listener = (dropped:DropRecord, opts:{ pos:{ x:number, y:number } })=>any
+type Listener = (dropped:DropRecord, opts:{
+    pos:{ x:number, y:number };
+    files:FileList;
+})=>any
 ```
 
 #### `ListenerObject`
