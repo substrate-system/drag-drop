@@ -69,7 +69,6 @@
     "vite": "^6.0.0"
   },
   "author": "nichoth <nichoth@nichoth.com> (https://nichoth.com)",
-  "license": "SEE LICENSE IN LICENSE",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/substrate-system/drag-drop.git"
@@ -82,5 +81,6 @@
   "bugs": {
     "url": "https://github.com/substrate-system/drag-drop/issues"
   },
-  "homepage": "https://github.com/substrate-system/drag-drop#readme"
+  "homepage": "https://github.com/substrate-system/drag-drop",
+  "license": "SEE LICENSE IN LICENSE"
 }
