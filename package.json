@@ -50,7 +50,7 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "@substrate-system/debug": "^0.8.0",
+    "@substrate-system/debug": "^0.9.0",
     "@substrate-system/dom": "^0.1.2",
     "@substrate-system/tapzero": "^0.10.3",
     "@types/wicg-file-system-access": "^2023.10.5",
