@@ -33,7 +33,7 @@ jobs:
       - name: Install
         run: npm install
       - name: Build
-        run: npm run build-example && npm run build-misc
+        run: npm run build-example
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
