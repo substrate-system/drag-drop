@@ -1,7 +1,7 @@
 import { dragDrop, type DropRecord } from '../src/index.js'
 import Debug from '@substrate-system/debug'
 import './style.css'
-const debug = Debug()
+const debug = Debug(import.meta.env.DEV || import.meta.env.MODE !== 'production')
 
 dragDrop('.dropzone', {
     onDrop: function (drop:DropRecord, { pos }) {
