@@ -4,8 +4,9 @@ import './style.css'
 const debug = Debug(import.meta.env.DEV || import.meta.env.MODE !== 'production')
 
 dragDrop('#dropzone', {
-    onDrop: function (drop:DropRecord, { pos }) {
+    onDrop: function (drop:DropRecord, { pos, files }) {
         debug('drop position', pos)
+        debug('drapped files', files)
         debug('the dropped stuff...', drop)
     },
 

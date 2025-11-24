@@ -145,8 +145,10 @@ export function dragDrop (
             y: ev.clientY
         }
 
+        // Capture files before async operation, as dataTransfer gets cleared
+        const files = ev.dataTransfer.files
         const record = await handleItems(ev.dataTransfer.items, showHidden)
-        listenerObject.onDrop?.(record, { pos, files: ev.dataTransfer.files })
+        listenerObject.onDrop?.(record, { pos, files })
 
         // text drop support
         const text:string = ev.dataTransfer.getData('text')
