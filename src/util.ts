@@ -31,15 +31,17 @@ export function isEventHandleable (
             return false
         }
 
-        if (!('onDropText' in listeners)) {
-            return false
-        }
-
-        if (fileItems.length === 0 && !listeners.onDropText) return false
-        if (textItems.length === 0 && !listeners.onDrop) return false
+        // Can't handle if dragging nothing
         if (fileItems.length === 0 && textItems.length === 0) return false
 
-        return true
+        // Can handle if dragging files and we have an onDrop handler
+        if (fileItems.length > 0 && listeners.onDrop) return true
+
+        // Can handle if dragging text and we have an onDropText handler
+        if (textItems.length > 0 && listeners.onDropText) return true
+
+        // Otherwise can't handle
+        return false
     }
     return false
 }

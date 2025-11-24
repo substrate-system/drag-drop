@@ -3,7 +3,7 @@ import Debug from '@substrate-system/debug'
 import './style.css'
 const debug = Debug(import.meta.env.DEV || import.meta.env.MODE !== 'production')
 
-dragDrop('.dropzone', {
+dragDrop('#dropzone', {
     onDrop: function (drop:DropRecord, { pos }) {
         debug('drop position', pos)
         debug('the dropped stuff...', drop)
@@ -14,6 +14,10 @@ dragDrop('.dropzone', {
     }
 })
 
-dragDrop('.dropzone', (dropRecord) => {
+dragDrop('#dropzone', (dropRecord) => {
     debug('including hidden files...', dropRecord)
 }, { showHiddenFiles: true })
+
+dragDrop('#dropzone2', d => {
+    debug('zone two', d)
+})

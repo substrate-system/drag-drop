@@ -5,8 +5,6 @@ import {
     handleItems,
     type DropRecord
 } from './util'
-// import Debug from '@substrate-system/debug'
-// const debug = Debug()
 
 export type { DropRecord }
 
@@ -16,7 +14,7 @@ export type Listener = (dropped:DropRecord, opts:{
 })=>any
 
 export type ListenerObject = {
-    onDrop:Listener;
+    onDrop?:Listener;
     onDropText?:(text:string, pos:{ x, y })=>any;
     onDragEnter?:(event:DragEvent)=>any;
     onDragOver?:(event:DragEvent)=>any;
@@ -148,7 +146,7 @@ export function dragDrop (
         }
 
         const record = await handleItems(ev.dataTransfer.items, showHidden)
-        listenerObject.onDrop(record, { pos, files: ev.dataTransfer.files })
+        listenerObject.onDrop?.(record, { pos, files: ev.dataTransfer.files })
 
         // text drop support
         const text:string = ev.dataTransfer.getData('text')
