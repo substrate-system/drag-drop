@@ -7,11 +7,15 @@
 [![install size](https://flat.badgen.net/packagephobia/install/@substrate-system/drag-drop?cache-control=no-cache)](https://packagephobia.com/result?p=@substrate-system/drag-drop)
 [![GZip size](https://flat.badgen.net/bundlephobia/minzip/@substrate-system/drag-drop)](https://bundlephobia.com/package/@substrate-system/drag-drop)
 [![dependencies](https://img.shields.io/badge/dependencies-zero-brightgreen.svg?style=flat-square)](package.json)
-[![license](https://img.shields.io/badge/license-Polyform_Non_Commercial-26bc71?style=flat-square)](LICENSE)
+[![license](https://img.shields.io/badge/license-Big_Time-blue?style=flat-square)](LICENSE)
 
-Simplify the [drag & drop API](https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API). Pass in a callback function, get drop events with a flat object of paths and files.
 
-Inspired by [feross/drag-drop](https://github.com/feross/drag-drop) -- drag & drop usable by humans.
+Simplify the [drag & drop API](https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API).
+Pass in a callback function, get drop events with a flat object of
+paths and files.
+
+Inspired by [feross/drag-drop](https://github.com/feross/drag-drop) --
+drag & drop usable by humans.
 
 [See a live demo](https://substrate-system.github.io/drag-drop/)
 
@@ -75,7 +79,12 @@ cp ./node_modules/@substrate-system/drag-drop/dist/index.min.js ./public/drag-dr
 ----------------------------------------------------------------------
 
 ## Get started
-This exposes a single function, `dragDrop`. Pass in a callback function, and get data objects containing all the files or directories that were dropped. By default the callback will not see any [hidden files (dot files)](https://en.wikipedia.org/wiki/Hidden_file_and_hidden_directory#Unix_and_Unix-like_environments). Pass in another argument with `{ showHiddenFiles: true }` if you do want to see hidden files.
+This exposes a single function, `dragDrop`. Pass in a callback function,
+and get data objects containing all the files or directories that were dropped.
+By default the callback will not see any
+[hidden files (dot files)](https://en.wikipedia.org/wiki/Hidden_file_and_hidden_directory#Unix_and_Unix-like_environments).
+Pass in another argument with `{ showHiddenFiles: true }` if you do want
+to see hidden files.
 
 ```js
 import { dragDrop, type DropRecord } from '@substrate-system/drag-drop'
@@ -94,7 +103,8 @@ dragrop('.dropper',  (drop:DropRecord, { pos, files }) => {
 ```
 
 ### CSS
-When someone hovers and drops something, a class `.drag` is added to the drop target.
+When someone hovers and drops something, a class `.drag`
+is added to the drop target.
 
 ```css
 .drag {
@@ -141,9 +151,12 @@ type ListenerObject = {
 ```
 
 ### Functions
-A single function, `dragDrop`, that takes an element, a listener, an an options object.
+A single function, `dragDrop`, that takes an element, a listener, an an
+options object.
 
-The third argument has a property `showHiddenFiles`, which if `true` will callback with all files, including ones that start with `.`. By default is `false`.
+The third argument has a property `showHiddenFiles`, which if `true` will
+callback with all files, including ones that start with `.`.
+By default is `false`.
 
 #### `dragDrop`
 ```ts
@@ -155,7 +168,8 @@ function dragDrop (
 ```
 
 ### Directories
-Drop a folder, get a flat object containing the files mapped by their path names.
+Drop a folder, get a flat object containing the files mapped by their
+path names.
 
 Given a folder structure like this:
 ```
@@ -168,7 +182,8 @@ abc
 3 directories, 2 files
 ```
 
-If we drop the top folder, `abc` into the drop zone, then we get an object like this:
+If we drop the top folder, `abc` into the drop zone, then we get an
+object like this:
 ```js
 {
     "/abc/aaaaa/bbb/testbbb.txt": File,
@@ -194,7 +209,9 @@ dragDrop('.dropzone', (drop:DropRecord, { pos } => {
 ```
 
 ### Hidden files
-Pass in an options object with `{ showHiddenFiles: true }` to get results including dot files. By default this will **exclude hidden files** from the results.
+Pass in an options object with `{ showHiddenFiles: true }` to get results
+including dot files. By default this will **exclude hidden files** from
+the results.
 
 #### Example
 
