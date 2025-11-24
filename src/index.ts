@@ -27,13 +27,14 @@ export type ListenerObject = {
  * Listen for drop events on an element. Get a nice flat object of files that
  * were dropped.
  *
+ * @returns A cleanup function that removes all event listeners
  * @throws {Error} If the given string selector does not match anything.
  */
 export function dragDrop (
     elem:HTMLElement|string,
     listeners:Listener|ListenerObject,
     opts?:{ showHiddenFiles?:boolean }
-):void {
+):()=>void {
     const showHidden = opts?.showHiddenFiles ?? false
     let el:HTMLElement|null
     if (typeof elem === 'string') {
@@ -156,5 +157,12 @@ export function dragDrop (
         }
 
         return false
+    }
+
+    return () => {
+        el!.removeEventListener('dragenter', onDragEnter, false)
+        el!.removeEventListener('dragover', onDragOver, false)
+        el!.removeEventListener('dragleave', onDragLeave, false)
+        el!.removeEventListener('drop', onDrop, false)
     }
 }

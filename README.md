@@ -164,7 +164,23 @@ function dragDrop (
     elem:HTMLElement|string,
     listeners:Listener|ListenerObject,
     opts?:{ showHiddenFiles?:boolean }
-):void
+):() => void
+```
+
+Returns a cleanup function that removes all event listeners that were created. Call this function when you no longer need the drag-drop functionality to prevent memory leaks.
+
+##### Example with cleanup
+
+```js
+import { dragDrop } from '@substrate-system/drag-drop'
+
+// dragDrop returns a cleanup function
+const cleanup = dragDrop('.dropper', (drop) => {
+  console.log('Files dropped:', drop)
+})
+
+// Later, when you want to remove the drag-drop listeners:
+cleanup()
 ```
 
 ### Directories
