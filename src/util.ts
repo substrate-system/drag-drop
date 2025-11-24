@@ -1,6 +1,4 @@
 import type { ListenerObject } from './index.js'
-import Debug from '@substrate-system/debug'
-const debug = Debug()
 
 /**
  * An object with file paths as keys.
@@ -69,12 +67,9 @@ export async function handleItems (
     items:DataTransferItemList,
     showHiddenFiles:boolean = false
 ):Promise<DropRecord> {
-    debug('handling it', showHiddenFiles)
     let files:DropRecord = {}
     for (let i = 0; i < items.length; i++) {
         const item = items[i].webkitGetAsEntry()
-        debug('fullpath', item?.fullPath)
-        debug('the pop', item?.fullPath.split('/').pop())
         if (item?.fullPath.split('/').pop()?.startsWith('.')) {
             if (!showHiddenFiles) continue
         }
