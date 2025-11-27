@@ -4,7 +4,7 @@ import {
     removeDragClass,
     handleItems,
     type DropRecord
-} from './util'
+} from './util.js'
 
 export type { DropRecord }
 
