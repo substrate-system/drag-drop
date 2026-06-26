@@ -69,9 +69,16 @@ export async function handleItems (
     items:DataTransferItemList,
     showHiddenFiles:boolean = false
 ):Promise<DropRecord> {
-    let files:DropRecord = {}
+    // A DataTransferItemList is only valid during the synchronous portion
+    // of the `drop` event. After the first `await` it is neutered and
+    // `webkitGetAsEntry()` returns null, so snapshot every entry up front.
+    const entries:(FileSystemEntry|null)[] = []
     for (let i = 0; i < items.length; i++) {
-        const item = items[i].webkitGetAsEntry()
+        entries.push(items[i].webkitGetAsEntry())
+    }
+
+    let files:DropRecord = {}
+    for (const item of entries) {
         if (item?.fullPath.split('/').pop()?.startsWith('.')) {
             if (!showHiddenFiles) continue
         }
@@ -82,7 +89,7 @@ export async function handleItems (
         } else if (item?.isDirectory) {
             files = await getFilesFromDirectory(
                 item as FileSystemDirectoryEntry,
-                null,
+                files,
                 showHiddenFiles
             )
         }

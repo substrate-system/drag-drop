@@ -147,7 +147,18 @@ export function dragDrop (
 
         // Capture files before async operation, as dataTransfer gets cleared
         const files = ev.dataTransfer.files
-        const record = await handleItems(ev.dataTransfer.items, showHidden)
+        let record = await handleItems(ev.dataTransfer.items, showHidden)
+
+        // `webkitGetAsEntry()` returns null for synthetic DataTransfer
+        // objects and in some browser contexts, leaving `record` empty even
+        // though files were dropped. Fall back to `dataTransfer.files`.
+        if (Object.keys(record).length === 0 && files.length > 0) {
+            record = {}
+            for (const file of Array.from(files)) {
+                record['/' + file.name] = file
+            }
+        }
+
         listenerObject.onDrop?.(record, { pos, files })
 
         // text drop support
